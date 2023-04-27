@@ -1,25 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { User, USER_TYPE } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { exclude } from 'src/utils/exclude';
 
+export const hashingRounds = 5;
 @Injectable()
 export class UsersService {
   constructor(readonly prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      hashingRounds,
+    );
+
+    createUserDto.password = hashedPassword;
+    createUserDto.type =
+      USER_TYPE[createUserDto.type] || USER_TYPE[USER_TYPE.SENDER];
+
+    const user = await this.prisma.user.create({
+      data: createUserDto,
+    });
+
+    return exclude(user, ['password', 'createdAt', 'updatedAt']);
   }
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  findByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
   }
 }

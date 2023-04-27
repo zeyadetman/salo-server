@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,6 +5,54 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid()) @db.Uuid
+  email     String    @unique
+  name      String
+  password  String
+  type      USER_TYPE @default(SENDER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  orders    Order[]
+  parcels   Parcel[]
+}
+
+model Address {
+  id        String   @id @default(uuid()) @db.Uuid
+  address   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  dropoff   Parcel[] @relation("dropoff")
+  pickup    Parcel[] @relation("pickup")
+}
+
+model Parcel {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pickupId  String   @db.Uuid
+  dropoffId String   @db.Uuid
+  ownerId   String   @db.Uuid
+  Order     Order?
+  dropoff   Address  @relation("dropoff", fields: [dropoffId], references: [id])
+  owner     User     @relation(fields: [ownerId], references: [id])
+  pickup    Address  @relation("pickup", fields: [pickupId], references: [id])
+}
+
+model Order {
+  id          String       @id @default(uuid()) @db.Uuid
+  status      ORDER_STATUS
+  parcelId    String       @unique @db.Uuid
+  pickupTime  DateTime
+  dropoffTime DateTime
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  bikerId     String       @db.Uuid
+  biker       User         @relation(fields: [bikerId], references: [id])
+  parcel      Parcel       @relation(fields: [parcelId], references: [id])
 }
 
 enum USER_TYPE {
@@ -19,52 +64,4 @@ enum ORDER_STATUS {
   PENDING
   PICKED_UP
   DROPPED_OFF
-}
-
-model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String
-  password  String
-  type      USER_TYPE @default(SENDER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  parcels   Parcel[]
-  orders    Order[]
-}
-
-model Address {
-  id        String   @id @default(uuid())
-  address   String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  pickup    Parcel[] @relation("pickup")
-  dropoff   Parcel[] @relation("dropoff")
-}
-
-model Parcel {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  pickup    Address  @relation("pickup", fields: [pickupId], references: [id])
-  pickupId  String
-  dropoff   Address  @relation("dropoff", fields: [dropoffId], references: [id])
-  dropoffId String
-  Order     Order?
-  owner     User     @relation(fields: [ownerId], references: [id])
-  ownerId   String
-}
-
-model Order {
-  id          String       @id @default(uuid())
-  status      ORDER_STATUS
-  parcel      Parcel       @relation(fields: [parcelId], references: [id])
-  parcelId    String       @unique
-  pickupTime  DateTime
-  dropoffTime DateTime
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  biker       User         @relation(fields: [bikerId], references: [id])
-  bikerId     String
 }

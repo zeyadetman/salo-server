@@ -1,6 +1,7 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaClientExceptionFilter } from 'src/prisma-client-exception/prisma-client-exception.filter';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { AppModule } from './app.module';
 
 const config = new DocumentBuilder()
@@ -8,6 +9,7 @@ const config = new DocumentBuilder()
   .setDescription('The API Documentaion for Salo Delivery App')
   .setVersion('1.0')
   .addTag('salo')
+  .addBearerAuth()
   .build();
 
 async function bootstrap() {
@@ -19,6 +21,9 @@ async function bootstrap() {
 
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   await app.listen(3000);
 }

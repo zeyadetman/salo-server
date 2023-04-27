@@ -6,7 +6,7 @@ CREATE TYPE "ORDER_STATUS" AS ENUM ('PENDING', 'PICKED_UP', 'DROPPED_OFF');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Address" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
     "address" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -29,27 +29,27 @@ CREATE TABLE "Address" (
 
 -- CreateTable
 CREATE TABLE "Parcel" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "pickupId" TEXT NOT NULL,
-    "dropoffId" TEXT NOT NULL,
-    "ownerId" TEXT NOT NULL,
+    "pickupId" UUID NOT NULL,
+    "dropoffId" UUID NOT NULL,
+    "ownerId" UUID NOT NULL,
 
     CONSTRAINT "Parcel_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Order" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
     "status" "ORDER_STATUS" NOT NULL,
-    "parcelId" TEXT NOT NULL,
+    "parcelId" UUID NOT NULL,
     "pickupTime" TIMESTAMP(3) NOT NULL,
     "dropoffTime" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "bikerId" TEXT NOT NULL,
+    "bikerId" UUID NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
