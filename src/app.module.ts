@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { ParcelsModule } from './parcels/parcels.module';
 import configuration from 'src/config/configuration';
 
 @Module({
@@ -14,6 +15,7 @@ import configuration from 'src/config/configuration';
     ConfigModule.forRoot({
       load: [configuration],
     }),
+    ParcelsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
