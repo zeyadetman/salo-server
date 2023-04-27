@@ -1,9 +1,16 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { exclude } from 'src/utils/exclude';
 
 @Controller('users')
 export class UsersController {
@@ -14,15 +21,11 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  // @Get('me')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
-  // findMe(a) {
-  //   return this.usersService.findMe(createUserDto);
-  // }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async findMe(@Request() req) {
+    const user = await this.usersService.findByEmail(req.user.email);
+    return exclude(user, ['password']);
   }
 }

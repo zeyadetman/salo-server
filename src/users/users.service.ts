@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User, USER_TYPE } from '@prisma/client';
+import { USER_TYPE } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { exclude } from 'src/utils/exclude';
 
@@ -25,10 +25,6 @@ export class UsersService {
     });
 
     return exclude(user, ['password', 'createdAt', 'updatedAt']);
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
   }
 
   findByEmail(email: string) {
