@@ -27,8 +27,10 @@ export class ParcelsController {
   }
 
   @Get()
-  findAll() {
-    return this.parcelsService.findAll();
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  findAll(@Request() req) {
+    return this.parcelsService.findAll(req.user);
   }
 
   @Get(':id')

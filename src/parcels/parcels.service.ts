@@ -80,8 +80,39 @@ export class ParcelsService {
     return parcel;
   }
 
-  findAll() {
-    return `This action returns all parcels`;
+  findAll(user: Partial<User>) {
+    const userType = user.type;
+    if (userType === USER_TYPE.BIKER) {
+      return this.prisma.parcel.findMany({
+        where: {
+          Order: {
+            is: null,
+          },
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      });
+    }
+
+    if (userType === USER_TYPE.SENDER) {
+      return this.prisma.parcel.findMany({
+        where: {
+          ownerId: user.id,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      });
+    }
+
+    throw new UnauthorizedException(
+      'Only senders and bikers can view parcels!',
+    );
   }
 
   findOne(id: number) {
