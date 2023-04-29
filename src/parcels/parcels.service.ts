@@ -92,6 +92,22 @@ export class ParcelsService {
         orderBy: {
           updatedAt: 'desc',
         },
+        select: {
+          pickup: {
+            select: {
+              address: true,
+              id: true,
+            },
+          },
+          dropoff: {
+            select: {
+              address: true,
+              id: true,
+            },
+          },
+          name: true,
+          id: true,
+        },
       });
     }
 
