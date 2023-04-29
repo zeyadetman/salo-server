@@ -120,6 +120,11 @@ export class ParcelsService {
         select: {
           id: true,
           name: true,
+          Order: {
+            select: {
+              status: true,
+            },
+          },
         },
         orderBy: {
           updatedAt: 'desc',
