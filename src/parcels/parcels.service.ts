@@ -11,6 +11,7 @@ import { UpdateParcelDto } from './dto/update-parcel.dto';
 @Injectable()
 export class ParcelsService {
   constructor(private prisma: PrismaService) {}
+
   async create(createParcelDto: CreateParcelDto, user: Partial<User>) {
     const userType = user.type;
     if (userType !== USER_TYPE.SENDER) {
