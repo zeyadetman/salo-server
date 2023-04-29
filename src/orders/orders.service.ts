@@ -3,13 +3,20 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { ORDER_STATUS, User, USER_TYPE } from '@prisma/client';
+import { Server } from 'https';
+import { EVENTS_TYPES } from 'src/events/events.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
+@WebSocketGateway()
 @Injectable()
 export class OrdersService {
+  @WebSocketServer()
+  server: Server;
+
   constructor(private prisma: PrismaService) {}
   async create(createOrderDto: CreateOrderDto, user: Partial<User>) {
     const userType = user.type;
@@ -37,7 +44,7 @@ export class OrdersService {
       );
     }
 
-    return await this.prisma.order.create({
+    const order = await this.prisma.order.create({
       data: {
         dropoffTime: dropoffDate,
         pickupTime: pickupDate,
@@ -54,6 +61,13 @@ export class OrdersService {
         },
       },
     });
+
+    this.server.emit(EVENTS_TYPES.ORDER_CREATED, order);
+    this.server.emit(EVENTS_TYPES.PARCEL_UPDATED, {
+      data: order,
+      to: parcel.ownerId,
+    });
+    return order;
   }
 
   findAll(user: Partial<User>) {
@@ -113,7 +127,7 @@ export class OrdersService {
       throw new BadRequestException('Order is not in picked up status!');
     }
 
-    return this.prisma.order.update({
+    const updatedOrder = await this.prisma.order.update({
       where: {
         id,
       },
@@ -121,6 +135,9 @@ export class OrdersService {
         status: ORDER_STATUS.DROPPED_OFF,
       },
     });
+
+    this.server.emit(EVENTS_TYPES.ORDER_UPDATED, updatedOrder);
+    return updatedOrder;
   }
 
   remove(id: number) {

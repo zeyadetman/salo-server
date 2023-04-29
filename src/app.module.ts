@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ParcelsModule } from './parcels/parcels.module';
 import { OrdersModule } from './orders/orders.module';
+import { EventsGateway } from './events/events.gateway';
 import configuration from 'src/config/configuration';
 
 @Module({
@@ -20,6 +21,6 @@ import configuration from 'src/config/configuration';
     OrdersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [AppService, PrismaService, EventsGateway],
 })
 export class AppModule {}

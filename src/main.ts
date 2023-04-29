@@ -1,5 +1,8 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { WebSocketGateway } from '@nestjs/websockets';
+import { EventsGateway } from 'src/events/events.gateway';
 import { PrismaClientExceptionFilter } from 'src/prisma-client-exception/prisma-client-exception.filter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AppModule } from './app.module';

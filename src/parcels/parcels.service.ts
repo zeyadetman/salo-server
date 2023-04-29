@@ -3,13 +3,19 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { User, USER_TYPE } from '@prisma/client';
+import { Server } from 'https';
+import { EVENTS_TYPES } from 'src/events/events.gateway';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateParcelDto } from './dto/create-parcel.dto';
 import { UpdateParcelDto } from './dto/update-parcel.dto';
 
+@WebSocketGateway()
 @Injectable()
 export class ParcelsService {
+  @WebSocketServer()
+  server: Server;
   constructor(private prisma: PrismaService) {}
 
   async create(createParcelDto: CreateParcelDto, user: Partial<User>) {
@@ -78,6 +84,7 @@ export class ParcelsService {
       throw new BadRequestException('Something went wrong!');
     }
 
+    this.server.emit(EVENTS_TYPES.PARCEL_CREATED, parcel);
     return parcel;
   }
 
