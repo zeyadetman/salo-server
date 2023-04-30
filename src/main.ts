@@ -1,8 +1,7 @@
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { WebSocketGateway } from '@nestjs/websockets';
-import { EventsGateway } from 'src/events/events.gateway';
+import configuration from 'src/config/configuration';
 import { PrismaClientExceptionFilter } from 'src/prisma-client-exception/prisma-client-exception.filter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AppModule } from './app.module';
@@ -17,8 +16,11 @@ const config = new DocumentBuilder()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    origin: [configuration().bikerWebAppUrl, configuration().senderWebAppUrl],
+  });
   app.enableVersioning();
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

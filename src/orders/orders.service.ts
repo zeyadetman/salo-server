@@ -64,9 +64,10 @@ export class OrdersService {
 
     this.server.emit(EVENTS_TYPES.ORDER_CREATED, order);
     this.server.emit(EVENTS_TYPES.PARCEL_UPDATED, {
-      data: order,
+      order,
       to: parcel.ownerId,
     });
+
     return order;
   }
 
@@ -136,7 +137,10 @@ export class OrdersService {
       },
     });
 
-    this.server.emit(EVENTS_TYPES.ORDER_UPDATED, updatedOrder);
+    this.server.emit(EVENTS_TYPES.ORDER_UPDATED, {
+      order: updatedOrder,
+      to: order.parcel.ownerId,
+    });
     return updatedOrder;
   }
 

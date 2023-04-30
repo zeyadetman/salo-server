@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'https';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
+import configuration from 'src/config/configuration';
 
 export enum EVENTS_TYPES {
   PARCEL_CREATED = 'parcelCreation',
@@ -20,7 +21,7 @@ export enum EVENTS_TYPES {
   cors: {
     credentials: true,
     methods: ['GET', 'POST'],
-    origin: ['http://localhost:3001'],
+    origin: [configuration().bikerWebAppUrl, configuration().senderWebAppUrl],
   },
   transports: ['polling', 'websocket'],
 })
@@ -39,7 +40,6 @@ export class EventsGateway {
   @UseGuards(JwtAuthGuard)
   @SubscribeMessage(EVENTS_TYPES.PARCEL_UPDATED)
   handleParcelUpdateEvent(@MessageBody() message: any, payload: any): string {
-    console.log({ message, payload });
     return 'Parcel updated!';
   }
 
