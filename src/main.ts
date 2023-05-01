@@ -5,6 +5,7 @@ import configuration from 'src/config/configuration';
 import { PrismaClientExceptionFilter } from 'src/prisma-client-exception/prisma-client-exception.filter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 const config = new DocumentBuilder()
   .setTitle('Salo Delivery API')
@@ -16,6 +17,7 @@ const config = new DocumentBuilder()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: [configuration().bikerWebAppUrl, configuration().senderWebAppUrl],
   });
